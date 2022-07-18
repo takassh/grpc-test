@@ -1,5 +1,7 @@
 # What's this
 - for studying grpc
+- implement server side by golang
+- implement client side by golang and flutter
 
 # reference
 - [grpc quickstart guide](https://grpc.io/docs/languages/go/quickstart/)
@@ -67,3 +69,25 @@ Got message Sixth message at point(0, 3)
 ```
 
 </details>
+
+# For Flutter Client (only native)
+## how to set up for Flutter (only native)
+- [reference](https://grpc.io/docs/languages/dart/quickstart/)
+- [install grpc package](https://pub.dev/packages/grpc/install)
+- install protoc-gen-dart
+    ```
+    dart pub global activate protoc_plugin
+    ```
+- generate client stub
+    ```shell
+    protoc --dart_out=grpc:client/flutter_client/lib/generated -Isimplegrpc simplegrpc/simple_grpc.proto
+    ```
+
+## how to test
+1. run golang server `go run server/server.go`
+1. run flutter app
+1. tap button
+
+# For React Client (TODO)
+## how to set up for React 
+- [it seems there is a bug](https://github.com/protocolbuffers/protobuf/issues/10114)
