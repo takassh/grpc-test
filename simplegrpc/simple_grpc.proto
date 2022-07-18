@@ -14,12 +14,12 @@
 
 syntax = "proto3";
 
-option go_package = "github.com/takassh/grpc-test/grpctest";
+option go_package = "github.com/takassh/simple-grpc/simplegrpc";
 
-package grpctest;
+package simplegrpc;
 
 // Interface exported by the server.
-service GrpcTest {
+service SimpleGrpc {
   // A simple RPC.
   //
   // Obtains the feature at a given position.

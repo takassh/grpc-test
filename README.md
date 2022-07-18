@@ -11,18 +11,18 @@
 - RouteChat [Bidirectional streaming RPC](https://grpc.io/docs/languages/go/basics/#bidirectional-streaming-rpc)
 
 # how to implement
-1. create `.proto` file like `grpc_test.proto`
+1. create `.proto` file like `simple_grpc.proto`
 1. run 
     ```go
     protoc --go_out=. --go_opt=paths=source_relative \
     --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    grpctest/grpc_test.proto
+    simplegrpc/simple_grpc.proto
     ```
-1. server implements `GrpcTestServer interface` and client implements `GrpcTestClient interface`. These files are in `grpctest/grpc_test_grpc.pb.go`
+1. server implements `SimpleGrpcServer interface` and client implements `SimpleGrpcClient interface`. These files are in `simplegrpc/simple_grpc_grpc.pb.go`
 1. start the server
     ```go
     grpcServer := grpc.NewServer(opts...)
-	pb.RegisterGrpcTestServer(grpcServer, newServer())
+	pb.RegisterSimpleGrpcServer(grpcServer, newServer())
 	grpcServer.Serve(lis)
     ```
 1. create the channel on client

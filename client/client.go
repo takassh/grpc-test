@@ -19,7 +19,7 @@
 // Package main implements a simple gRPC client that demonstrates how to use gRPC-Go libraries
 // to perform unary, client streaming, server streaming and full duplex RPCs.
 //
-// It interacts with the route guide service whose definition can be found in routeguide/route_guide.proto.
+// It interacts with the route guide service whose definition can be found in simplegrpc/simple_grpc.proto.
 package main
 
 import (
@@ -30,8 +30,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/takassh/grpc-test/data"
-	pb "github.com/takassh/grpc-test/grpctest"
+	"github.com/takassh/simple-grpc/data"
+	pb "github.com/takassh/simple-grpc/simplegrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -45,7 +45,7 @@ var (
 )
 
 // printFeature gets the feature for the given point.
-func printFeature(client pb.GrpcTestClient, point *pb.Point) {
+func printFeature(client pb.SimpleGrpcClient, point *pb.Point) {
 	log.Printf("Getting feature for point (%d, %d)", point.Latitude, point.Longitude)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -57,7 +57,7 @@ func printFeature(client pb.GrpcTestClient, point *pb.Point) {
 }
 
 // printFeatures lists all the features within the given bounding Rectangle.
-func printFeatures(client pb.GrpcTestClient, rect *pb.Rectangle) {
+func printFeatures(client pb.SimpleGrpcClient, rect *pb.Rectangle) {
 	log.Printf("Looking for features within %v", rect)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -79,7 +79,7 @@ func printFeatures(client pb.GrpcTestClient, rect *pb.Rectangle) {
 }
 
 // runRecordRoute sends a sequence of points to server and expects to get a RouteSummary from server.
-func runRecordRoute(client pb.GrpcTestClient) {
+func runRecordRoute(client pb.SimpleGrpcClient) {
 	// Create a random number of random points
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	pointCount := int(r.Int31n(100)) + 2 // Traverse at least two points
@@ -107,7 +107,7 @@ func runRecordRoute(client pb.GrpcTestClient) {
 }
 
 // runRouteChat receives a sequence of route notes, while sending notes for various locations.
-func runRouteChat(client pb.GrpcTestClient) {
+func runRouteChat(client pb.SimpleGrpcClient) {
 	notes := []*pb.RouteNote{
 		{Location: &pb.Point{Latitude: 0, Longitude: 1}, Message: "First message"},
 		{Location: &pb.Point{Latitude: 0, Longitude: 2}, Message: "Second message"},
@@ -173,7 +173,7 @@ func main() {
 		log.Fatalf("fail to dial: %v", err)
 	}
 	defer conn.Close()
-	client := pb.NewGrpcTestClient(conn)
+	client := pb.NewSimpleGrpcClient(conn)
 
 	// Looking for a valid feature
 	printFeature(client, &pb.Point{Latitude: 409146138, Longitude: -746188906})

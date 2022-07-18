@@ -1,4 +1,4 @@
-module github.com/takassh/grpc-test
+module github.com/takassh/simple-grpc
 
 go 1.18
 

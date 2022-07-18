@@ -19,7 +19,7 @@
 // Package main implements a simple gRPC server that demonstrates how to use gRPC-Go libraries
 // to perform unary, client streaming, server streaming and full duplex RPCs.
 //
-// It implements the route guide service whose definition can be found in routeguide/route_guide.proto.
+// It implements the route guide service whose definition can be found in simplegrpc/simple_grpc.proto.
 package main
 
 import (
@@ -37,12 +37,12 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/takassh/grpc-test/data"
+	"github.com/takassh/simple-grpc/data"
 	"google.golang.org/grpc/credentials"
 
 	"github.com/golang/protobuf/proto"
 
-	pb "github.com/takassh/grpc-test/grpctest"
+	pb "github.com/takassh/simple-grpc/simplegrpc"
 )
 
 var (
@@ -53,8 +53,8 @@ var (
 	port       = flag.Int("port", 50051, "The server port")
 )
 
-type grpcTestServer struct {
-	pb.UnimplementedGrpcTestServer
+type simpleGrpcServer struct {
+	pb.UnimplementedSimpleGrpcServer
 	savedFeatures []*pb.Feature // read-only after initialized
 
 	mu         sync.Mutex // protects routeNotes
@@ -62,7 +62,7 @@ type grpcTestServer struct {
 }
 
 // GetFeature returns the feature at the given point.
-func (s *grpcTestServer) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feature, error) {
+func (s *simpleGrpcServer) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feature, error) {
 	for _, feature := range s.savedFeatures {
 		if proto.Equal(feature.Location, point) {
 			return feature, nil
@@ -73,7 +73,7 @@ func (s *grpcTestServer) GetFeature(ctx context.Context, point *pb.Point) (*pb.F
 }
 
 // ListFeatures lists all features contained within the given bounding Rectangle.
-func (s *grpcTestServer) ListFeatures(rect *pb.Rectangle, stream pb.GrpcTest_ListFeaturesServer) error {
+func (s *simpleGrpcServer) ListFeatures(rect *pb.Rectangle, stream pb.SimpleGrpc_ListFeaturesServer) error {
 	for _, feature := range s.savedFeatures {
 		if inRange(feature.Location, rect) {
 			if err := stream.Send(feature); err != nil {
@@ -89,7 +89,7 @@ func (s *grpcTestServer) ListFeatures(rect *pb.Rectangle, stream pb.GrpcTest_Lis
 // It gets a stream of points, and responds with statistics about the "trip":
 // number of points,  number of known features visited, total distance traveled, and
 // total time spent.
-func (s *grpcTestServer) RecordRoute(stream pb.GrpcTest_RecordRouteServer) error {
+func (s *simpleGrpcServer) RecordRoute(stream pb.SimpleGrpc_RecordRouteServer) error {
 	var pointCount, featureCount, distance int32
 	var lastPoint *pb.Point
 	startTime := time.Now()
@@ -122,7 +122,7 @@ func (s *grpcTestServer) RecordRoute(stream pb.GrpcTest_RecordRouteServer) error
 
 // RouteChat receives a stream of message/location pairs, and responds with a stream of all
 // previous messages at each of those locations.
-func (s *grpcTestServer) RouteChat(stream pb.GrpcTest_RouteChatServer) error {
+func (s *simpleGrpcServer) RouteChat(stream pb.SimpleGrpc_RouteChatServer) error {
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -151,7 +151,7 @@ func (s *grpcTestServer) RouteChat(stream pb.GrpcTest_RouteChatServer) error {
 }
 
 // loadFeatures loads features from a JSON file.
-func (s *grpcTestServer) loadFeatures(filePath string) {
+func (s *simpleGrpcServer) loadFeatures(filePath string) {
 	var data []byte
 	if filePath != "" {
 		var err error
@@ -211,8 +211,8 @@ func serialize(point *pb.Point) string {
 	return fmt.Sprintf("%d %d", point.Latitude, point.Longitude)
 }
 
-func newServer() *grpcTestServer {
-	s := &grpcTestServer{routeNotes: make(map[string][]*pb.RouteNote)}
+func newServer() *simpleGrpcServer {
+	s := &simpleGrpcServer{routeNotes: make(map[string][]*pb.RouteNote)}
 	s.loadFeatures(*jsonDBFile)
 	return s
 }
@@ -238,7 +238,7 @@ func main() {
 		opts = []grpc.ServerOption{grpc.Creds(creds)}
 	}
 	grpcServer := grpc.NewServer(opts...)
-	pb.RegisterGrpcTestServer(grpcServer, newServer())
+	pb.RegisterSimpleGrpcServer(grpcServer, newServer())
 	grpcServer.Serve(lis)
 }
 
